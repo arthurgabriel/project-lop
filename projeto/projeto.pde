@@ -1,9 +1,8 @@
-final int POSITION_SHIFT = 6;
+final int POSITION_SHIFT = 10;
+final PShape[] obstacles = new PShape[4];
 
 float xPos1, xPos2, xPos3;
-float xCirclePos, yCirclePos;
-boolean flag = false;
-boolean canWalk = true;
+
 
 void setup() {
   size(700, 700);
@@ -14,17 +13,15 @@ void setup() {
   xPos2 = 700.0/2;
   xPos3 = 400;
   
-  //obstacle
-  xCirclePos = random(700);
-  yCirclePos = 0;
+  addTheObstacles();
 }
 
 void draw() {
   background(155);
   triangle(xPos1, 690, xPos2, 600, xPos3, 690);
-  ellipse(xCirclePos, yCirclePos, 55, 55);
-  
-    obstacleWalk();
+  //for(int i = 0; i < obstacles.length; i++){
+  // obstacleWalk(obstacles[i]);
+  //}
 }
 
 void keyPressed() {
@@ -45,17 +42,35 @@ void keyPressed() {
   }
 }
 
-void obstacleWalk(){
-  if(yCirclePos == 755){
-    yCirclePos = -55;
-    canWalk = false;
-  } else if(canWalk)
-    yCirclePos++;
-  else {
-    float randomNumber = random(100);
-    if (randomNumber > 99){
-      xCirclePos = random(700);
-      canWalk = true; 
-    } 
+// faz com que o obstáculo ande pela tela;
+// se reposicione quando sai de vista;
+// volte a sua borda de origem em um local diferente;
+// só volte a andar depois de um certo tempo.
+void obstacleWalk(PShape obstacle){
+  PVector v = obstacle.getVertex(0);
+  if(v.y == 755){  
+    v.x = random(700);
+    v.y = -55;
+    obstacle.setVertex(0, v);
+  } else {
+    v.y += 1;
+    obstacle.setVertex(0, v);
   }  
+}
+
+void addTheObstacles(){
+  for(int i = 0; i < obstacles.length; i++){
+    obstacles[i] = createShape(ELLIPSE, random(700), 0, 55, 55);
+    
+    if(i == 0)
+      obstacles[i].setFill(color(255,0,0));
+    else if (i == 1)
+      obstacles[i].setFill(color(0,0,255));
+    else if (i == 2)
+      obstacles[i].setFill(color(0,255,0));
+    else
+      obstacles[i].setFill(color(255,0,0));
+      
+    shape(obstacles[i]);
+  }
 }
