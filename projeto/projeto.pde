@@ -1,76 +1,116 @@
 final int POSITION_SHIFT = 10;
-final PShape[] obstacles = new PShape[4];
+final static int numObstacles = 4;
+final Obstacle[] obstacles = new Obstacle[numObstacles];
 
-float xPos1, xPos2, xPos3;
+//posição inicial do jogador.
+float PlayerxPos1, PlayerxPos2, PlayerxPos3;
+boolean play = true; //se 'false' o jogo para.
+int lifes = 3;
 
+class Obstacle {
+  float xPos;
+  float yPos;
+  boolean canWalk;
+  boolean canShow;
+
+  Obstacle() {
+    xPos   = random(700);
+    yPos = 0;
+    canWalk = true;
+    canShow = false;
+  }
+  
+  void display(){
+    if(random(100) > 99)
+      canShow = true;
+    
+    if(canShow)
+      ellipse(xPos, yPos, 55, 55);  
+  }
+  
+  void walk(){
+    if(canShow){
+      if(yPos >= 755){  
+        xPos = random(700);
+        yPos = -55;
+        canWalk = false;
+      } else {
+        if(canWalk)
+          yPos += 2;
+        else{
+          if(random(100) > 99)
+            canWalk = true;
+        }
+      }
+    }
+  }
+  
+  boolean checkColision(){
+    if((yPos + 27.5) >= 600 && (yPos - 27.5) <= 690){
+      float altura = yPos - 600;
+      double baseMenorTrapezio = ((PlayerxPos3 - PlayerxPos2)/90) * altura * 2;
+      double aux =  (PlayerxPos3 - (PlayerxPos1 + baseMenorTrapezio))/2;
+      if(((xPos + 32) >= (PlayerxPos1 + aux) && (xPos - 32) <= (PlayerxPos3 - aux)))
+        return true;
+    }
+    return false;  
+  }
+}
 
 void setup() {
   size(700, 700);
   background(155);
   
-  //player
-  xPos1 = 300;
-  xPos2 = 700.0/2;
-  xPos3 = 400;
+  //posição iniciao do jogador
+  PlayerxPos1 = 300;
+  PlayerxPos2 = 700.0/2;
+  PlayerxPos3 = 400;
   
-  addTheObstacles();
+  for(int i = 0; i < numObstacles; i++){
+    Obstacle obs = new Obstacle();
+    obstacles[i] = obs;
+  }
 }
 
 void draw() {
   background(155);
-  triangle(xPos1, 690, xPos2, 600, xPos3, 690);
-  //for(int i = 0; i < obstacles.length; i++){
-  // obstacleWalk(obstacles[i]);
-  //}
-}
-
-void keyPressed() {
-  if (keyCode == RIGHT) {
-    if (xPos3 == 700)
-      return;
+  triangle(PlayerxPos1, 690, PlayerxPos2, 600, PlayerxPos3, 690);
+  
+  //mostra a quatidade de vidas do jogador.
+  for(int i = 1; i <= lifes; i++){
+    int aux = (20 * i);
+    triangle(10+aux, 30, 20+aux, 10, 30+aux, 30);
+  }
+  
+  for(int i = 0; i < obstacles.length; i++){
+    obstacles[i].display();
+    if (play){
+      obstacles[i].walk();
       
-    xPos1 += POSITION_SHIFT;
-    xPos2 += POSITION_SHIFT;
-    xPos3 += POSITION_SHIFT;
-  } else if (keyCode == LEFT) {
-    if (xPos1 == 0)
-      return;
-    
-    xPos1 -= POSITION_SHIFT;
-    xPos2 -= POSITION_SHIFT;
-    xPos3 -= POSITION_SHIFT;
+      if(obstacles[i].checkColision()){
+        play = false;
+        lifes--;  
+      }
+    }
   }
 }
 
-// faz com que o obstáculo ande pela tela;
-// se reposicione quando sai de vista;
-// volte a sua borda de origem em um local diferente;
-// só volte a andar depois de um certo tempo.
-void obstacleWalk(PShape obstacle){
-  PVector v = obstacle.getVertex(0);
-  if(v.y == 755){  
-    v.x = random(700);
-    v.y = -55;
-    obstacle.setVertex(0, v);
-  } else {
-    v.y += 1;
-    obstacle.setVertex(0, v);
-  }  
-}
-
-void addTheObstacles(){
-  for(int i = 0; i < obstacles.length; i++){
-    obstacles[i] = createShape(ELLIPSE, random(700), 0, 55, 55);
-    
-    if(i == 0)
-      obstacles[i].setFill(color(255,0,0));
-    else if (i == 1)
-      obstacles[i].setFill(color(0,0,255));
-    else if (i == 2)
-      obstacles[i].setFill(color(0,255,0));
-    else
-      obstacles[i].setFill(color(255,0,0));
+void keyPressed() {
+  if (play) {
+    if (keyCode == RIGHT) {
+      if (PlayerxPos3 == 700)
+        return;
+        
+      PlayerxPos1 += POSITION_SHIFT;
+      PlayerxPos2 += POSITION_SHIFT;
+      PlayerxPos3 += POSITION_SHIFT;
+    } else if (keyCode == LEFT) {
+      if (PlayerxPos1 == 0)
+        return;
       
-    shape(obstacles[i]);
+      PlayerxPos1 -= POSITION_SHIFT;
+      PlayerxPos2 -= POSITION_SHIFT;
+      PlayerxPos3 -= POSITION_SHIFT;
+    }
   }
 }
