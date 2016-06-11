@@ -14,6 +14,7 @@ PImage background;
 PFont f;
 int level = 1;
 int numObstaclesGone = 0;
+int score = 0;
 
 class Obstacle {
   float xPos;
@@ -31,7 +32,6 @@ class Obstacle {
   void display(){
     if(random(100) > 99) {
       canShow = true;
-      numObstaclesGone++;
     }
     
     if(canShow)
@@ -45,8 +45,13 @@ class Obstacle {
         yPos = -55;
         canWalk = false;
       } else {
-        if(canWalk)
+        if(canWalk) {
           yPos += 2 * level;
+          if (yPos > 700) {
+            numObstaclesGone++;
+            score++;
+          }
+        }
         else{
           if(random(100) > 99)
             canWalk = true;
@@ -61,9 +66,9 @@ class Obstacle {
       double baseMenorTrapezio = ((PlayerxPos3 - PlayerxPos2)/90) * altura * 2;
       double aux =  (PlayerxPos3 - (PlayerxPos1 + baseMenorTrapezio))/2;
       if(((xPos + 32) >= (PlayerxPos1 + aux) && (xPos - 32) <= (PlayerxPos3 - aux)))
-        return true;
+      return true;
     } //<>//
-    
+  
     return false;
   }
 }
@@ -75,7 +80,7 @@ void setup() {
   
   background = loadImage("images/background.png");
   size(700, 700);
-  background(background);
+  background(background);   
   
   //posição iniciao do jogador
   PlayerxPos1 = 300;
@@ -105,7 +110,8 @@ void draw() {
     }
   } else {
     text("Level: " + level, 600, 28);
-    if (numObstaclesGone > 100){
+    text("Score: " + score, 600, 58);
+    if (numObstaclesGone > 500){
       level++;
       numObstaclesGone = 0;
     }
