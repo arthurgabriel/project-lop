@@ -5,7 +5,13 @@ final Obstacle[] obstacles = new Obstacle[numObstacles];
 //posição inicial do jogador.
 float PlayerxPos1, PlayerxPos2, PlayerxPos3;
 boolean play = true; //se 'false' o jogo para.
-int lifes = 3;
+int lives = 3;
+
+// Background
+PImage background;
+
+// Tela inicial
+PFont f;
 
 class Obstacle {
   float xPos;
@@ -14,8 +20,8 @@ class Obstacle {
   boolean canShow;
 
   Obstacle() {
-    xPos   = random(700);
-    yPos = 0;
+    xPos    = random(700);
+    yPos    = 0;
     canWalk = true;
     canShow = false;
   }
@@ -25,7 +31,7 @@ class Obstacle {
       canShow = true;
     
     if(canShow)
-      ellipse(xPos, yPos, 55, 55);  
+      ellipse(xPos, yPos, 55, 55);
   }
   
   void walk(){
@@ -53,13 +59,18 @@ class Obstacle {
       if(((xPos + 32) >= (PlayerxPos1 + aux) && (xPos - 32) <= (PlayerxPos3 - aux)))
         return true;
     }
-    return false;  
+    return false;
   }
 }
 
 void setup() {
+  // Tela Inicial
+  f = createFont("Georgia", 16, true);
+  play = false;
+  
+  background = loadImage("images/background.png");
   size(700, 700);
-  background(155);
+  background(background);
   
   //posição iniciao do jogador
   PlayerxPos1 = 300;
@@ -73,23 +84,36 @@ void setup() {
 }
 
 void draw() {
-  background(155);
+  background(background); 
   triangle(PlayerxPos1, 690, PlayerxPos2, 600, PlayerxPos3, 690);
   
+  if (!play) {
+    textFont(f, 24);
+    textAlign(CENTER);
+    fill(255);
+    if (lives == 3) {
+      text("Pressione <enter> para iniciar o jogo!", 700/2, 700/2);
+    } else if (lives > 0) {
+      text("Você perdeu uma vida, pressione <enter> para iniciar o jogo novamente", 45, 700/2, 600, 600);
+    } else {
+      text("GAME OVER", 700/2, 700/2);
+    }
+  }
+  
   //mostra a quatidade de vidas do jogador.
-  for(int i = 1; i <= lifes; i++){
+  for(int i = 1; i <= lives; i++){
     int aux = (20 * i);
     triangle(10+aux, 30, 20+aux, 10, 30+aux, 30);
   }
   
   for(int i = 0; i < obstacles.length; i++){
-    obstacles[i].display();
     if (play){
+      obstacles[i].display();
       obstacles[i].walk();
       
       if(obstacles[i].checkColision()){
         play = false;
-        lifes--;  
+        lives--;
       }
     }
   }
@@ -111,6 +135,14 @@ void keyPressed() {
       PlayerxPos1 -= POSITION_SHIFT;
       PlayerxPos2 -= POSITION_SHIFT;
       PlayerxPos3 -= POSITION_SHIFT;
+    }
+  } else {
+    if (keyCode == ENTER) {
+      play = true;
+      for(int i = 0; i < numObstacles; i++){
+        Obstacle obs = new Obstacle();
+        obstacles[i] = obs;
+      }
     }
   }
 }
