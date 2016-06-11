@@ -10,8 +10,10 @@ int lives = 3;
 // Background
 PImage background;
 
-// Tela inicial
+// Textos
 PFont f;
+int level = 1;
+int numObstaclesGone = 0;
 
 class Obstacle {
   float xPos;
@@ -27,8 +29,10 @@ class Obstacle {
   }
   
   void display(){
-    if(random(100) > 99)
+    if(random(100) > 99) {
       canShow = true;
+      numObstaclesGone++;
+    }
     
     if(canShow)
       ellipse(xPos, yPos, 55, 55);
@@ -42,7 +46,7 @@ class Obstacle {
         canWalk = false;
       } else {
         if(canWalk)
-          yPos += 2;
+          yPos += 2 * level;
         else{
           if(random(100) > 99)
             canWalk = true;
@@ -58,7 +62,8 @@ class Obstacle {
       double aux =  (PlayerxPos3 - (PlayerxPos1 + baseMenorTrapezio))/2;
       if(((xPos + 32) >= (PlayerxPos1 + aux) && (xPos - 32) <= (PlayerxPos3 - aux)))
         return true;
-    }
+    } //<>//
+    
     return false;
   }
 }
@@ -97,6 +102,12 @@ void draw() {
       text("Você perdeu uma vida, pressione <enter> para iniciar o jogo novamente", 45, 700/2, 600, 600);
     } else {
       text("GAME OVER", 700/2, 700/2);
+    }
+  } else {
+    text("Level: " + level, 600, 28);
+    if (numObstaclesGone > 100){
+      level++;
+      numObstaclesGone = 0;
     }
   }
   
